@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <title>6 Sliders med zig-zag vertikal streg og labels</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    .container {
+      position: relative;
+      width: 80%;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .slider-row .label {
+      width: 80px;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .slider-row .label.left {
+      text-align: right;
+      padding-right: 10px;
+    }
+    .slider-row .label.right {
+      text-align: left;
+      padding-left: 10px;
+    }
+    .slider {
+      flex: 1;
+      outline: none;
+    }
+    .slider::-webkit-slider-runnable-track {
+      height: 6px;
+      background: #ddd;
+      border-radius: 3px;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #666;
+      border-radius: 50%;
+      margin-top: -5px;
+      cursor: pointer;
+    }
+    /* SVG overlay til zig-zag linje */
+    #slider-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="slider-container">
+    <svg id="slider-line">
+      <polyline id="polyline" fill="none" stroke="#e74c3c" stroke-width="2" />
+    </svg>
+
+    <!-- Seks sliders med labels -->
+    <div class="slider-row">
+      <span class="label left">Start</span>
+      <input type="range" min="0" max="100" value="50" class="slider">
+      <span class="label right">Slut</span>
+    </div>
+    <div class="slider-row">
+      <span class="label left">Lydstyrke</span>
+      <input type="range" min="0" max="100" value="30" class="slider">
+      <span class="label right">%</span>
+    </div>
+    <div class="slider-row">
+      <span class="label left">Temperatur</span>
+      <input type="range" min="-10" max="40" value="20" class="slider">
+      <span class="label right">°C</span>
+    </div>
+    <div class="slider-row">
+      <span class="label left">Lys</span>
+      <input type="range" min="0" max="100" value="75" class="slider">
+      <span class="label right">%</span>
+    </div>
+    <div class="slider-row">
+      <span class="label left">Hastighed</span>
+      <input type="range" min="0" max="200" value="100" class="slider">
+      <span class="label right">km/t</span>
+    </div>
+    <div class="slider-row">
+      <span class="label left">Zoom</span>
+      <input type="range" min="1" max="10" value="5" class="slider">
+      <span class="label right">x</span>
+    </div>
+
+  </div>
+
+  <script>
+    const container = document.getElementById('slider-container');
+    const sliders = Array.from(container.querySelectorAll('.slider'));
+    const polyline = document.getElementById('polyline');
+
+    function updateZigzag() {
+      const contRect = container.getBoundingClientRect();
+      const points = sliders.map(slider => {
+        const rect = slider.getBoundingClientRect();
+        const percent = (slider.value - slider.min) / (slider.max - slider.min);
+        const x = rect.left - contRect.left + percent * rect.width;
+        const y = rect.top - contRect.top + rect.height / 2;
+        return `${x},${y}`;
+      });
+      polyline.setAttribute('points', points.join(' '));
+    }
+
+    sliders.forEach(slider => slider.addEventListener('input', updateZigzag));
+    window.addEventListener('load', updateZigzag);
+    window.addEventListener('resize', updateZigzag);
+  </script>
+
+</body>
+</html>
